@@ -738,7 +738,7 @@ async function ai(prompt) {
     sw('setup');
     throw new Error('No Gemini API key');
   }
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cfg.ai}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent" \ -H 'Content-Type: application/json' \ -H 'X-goog-api-key: AIzaSyDOXZBg2iYSrkhwyG3MVQlwVwLyglBriLY' \ -X POST \ -d '{ "contents": [ { "parts": [ { "text": "Explain how AI works in a few words" } ] } ] }'`;
   const r = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
