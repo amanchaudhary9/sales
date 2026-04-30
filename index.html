@@ -315,7 +315,7 @@ tr:hover td{background:var(--bg4)}
           <div class="setup-card-title">👤 Step 3 — Aapki Details (Signature ke liye)</div>
           <div class="setup-card-sub">Yeh sab emails mein signature mein aayega.</div>
           <div class="g2">
-            <div class="field"><span class="lbl">Aapka Naam</span><input class="inp" id="s-sname" placeholder="e.g. Aman Sharma" /></div>
+            <div class="field"><span class="lbl">Aapka Naam</span><input class="inp" id="s-sname" placeholder="e.g. Aman Chaudhary" /></div>
             <div class="field"><span class="lbl">Designation</span><input class="inp" id="s-desig" placeholder="e.g. Sales Manager" /></div>
           </div>
           <div class="g2">
@@ -535,7 +535,7 @@ tr:hover td{background:var(--bg4)}
 // ══════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════
-let cfg = { svcId:'', tplId:'', pubKey:'', senderName:'Aman Sharma', desig:'Sales Manager', company:'Aman EduTech', phone:'', course:'' };
+let cfg = { svcId:'', tplId:'', pubKey:'', senderName:'Aman Chaudhary', desig:'Sales Manager', company:'Aman EduTech', phone:'', course:'' };
 let leads = [
   {id:1,name:'Priya Mehta',org:'Infosys Learning',email:'priya.m@infosys.com',role:'Training Head',status:'contacted'},
   {id:2,name:'Rahul Verma',org:'Delhi University',email:'r.verma@du.ac.in',role:'Academic Coord.',status:'new'},
@@ -685,7 +685,7 @@ async function testEmail() {
 }
 
 function saveSender() {
-  cfg.senderName = gv('s-sname')||'Aman Sharma';
+  cfg.senderName = gv('s-sname')||'Aman Chaudhary';
   cfg.desig      = gv('s-desig')||'Sales Manager';
   cfg.company    = gv('s-comp')||'Aman EduTech';
   cfg.phone      = gv('s-phone');
@@ -759,7 +759,7 @@ function parseEmail(txt) {
 }
 
 function sig() {
-  return `${cfg.senderName||'Aman Sharma'}\n${cfg.desig||'Sales Manager'} | ${cfg.company||'Aman EduTech'}${cfg.phone?'\nPh: '+cfg.phone:''}`;
+  return `${cfg.senderName||'Aman Chaudhary'}\n${cfg.desig||'Sales Manager'} | ${cfg.company||'Aman EduTech'}${cfg.phone?'\nPh: '+cfg.phone:''}`;
 }
 
 // ══════════════════════════════════════
@@ -1050,7 +1050,7 @@ SUBJECT: [subject]
 ---
 [email body]
 
-Rules: 160-200 words. Personalized opener. Clear value. Soft CTA (15-min call or free demo). Sign as ${cfg.senderName||'Aman Sharma'}, ${cfg.desig||'Sales Manager'}, ${cfg.company||'Aman EduTech'}. No bracket placeholders.`;
+Rules: 160-200 words. Personalized opener. Clear value. Soft CTA (15-min call or free demo). Sign as ${cfg.senderName||'Aman Chaudhary'}, ${cfg.desig||'Sales Manager'}, ${cfg.company||'Aman EduTech'}. No bracket placeholders.`;
 
     try {
       const res = await ai(prompt);
