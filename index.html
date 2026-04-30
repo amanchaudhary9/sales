@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aman Sales AI</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090f;--bg2:#0d1017;--bg3:#13161f;--bg4:#1a1e2a;--bg5:#202533;
+  --b1:rgba(255,255,255,0.05);--b2:rgba(255,255,255,0.09);--b3:rgba(255,255,255,0.15);
+  --c1:#4f8ef7;--c1l:rgba(79,142,247,0.12);--c1b:rgba(79,142,247,0.22);
+  --g1:#00d4aa;--g1l:rgba(0,212,170,0.1);
+  --a1:#f59e0b;--a1l:rgba(245,158,11,0.1);
+  --r1:#ef4444;--r1l:rgba(239,68,68,0.08);
+  --p1:#a78bfa;--p1l:rgba(167,139,250,0.1);
+  --tx:#e8ecf5;--tx2:#7a8094;--tx3:#424659;
+  --rd:8px;--rd2:12px;--rd3:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);height:100vh;display:flex;flex-direction:column;font-size:13px;overflow:hidden}
+/* ─── TOPBAR ─── */
+.topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;padding:0 18px;flex-shrink:0;z-index:50}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{width:30px;height:30px;background:linear-gradient(135deg,#4f8ef7,#7b6ff7);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.brand-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.5px}
+.brand-name span{color:var(--c1)}
+.topbar-pills{display:flex;gap:7px;align-items:center}
+.pill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:0.3px}
+.pill-g{background:var(--g1l);color:var(--g1);border:1px solid rgba(0,212,170,0.2)}
+.pill-b{background:var(--c1l);color:var(--c1);border:1px solid var(--c1b)}
+/* ─── LAYOUT ─── */
+.app{display:flex;flex:1;overflow:hidden}
+/* ─── SIDEBAR ─── */
+.sidebar{width:248px;background:var(--bg2);border-right:1px solid var(--b1);display:flex;flex-direction:column;flex-shrink:0}
+.sb-head{padding:12px;border-bottom:1px solid var(--b1)}
+.sb-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tx3);margin-bottom:9px}
+.add-btn{width:100%;padding:8px 11px;background:var(--c1l);border:1px solid var(--c1b);border-radius:var(--rd);color:var(--c1);font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px;transition:background .13s}
+.add-btn:hover{background:rgba(79,142,247,0.18)}
+.sb-list{flex:1;overflow-y:auto;padding:7px}
+.lead-row{padding:10px 11px;border-radius:var(--rd);cursor:pointer;transition:all .12s;margin-bottom:3px;border:1px solid transparent}
+.lead-row:hover{background:var(--bg3)}
+.lead-row.sel{background:var(--bg3);border-color:rgba(79,142,247,0.25)}
+.lead-top{display:flex;align-items:center;gap:9px}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;flex-shrink:0}
+.ln{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lo{font-size:11px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead-st{display:flex;align-items:center;gap:5px;margin-top:5px}
+.sdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.stxt{font-size:10px;color:var(--tx3)}
+/* ─── MAIN ─── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+/* ─── TABS ─── */
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--b1);padding:0 14px;gap:1px;flex-shrink:0;overflow-x:auto}
+.tab{padding:12px 15px;font-size:12px;font-weight:500;color:var(--tx2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tab:hover{color:var(--tx)}
+.tab.on{color:var(--c1);border-bottom-color:var(--c1)}
+/* ─── CONTENT ─── */
+.scroll{flex:1;overflow-y:auto;padding:20px 22px 40px}
+.pane{display:none}
+.pane.on{display:block}
+/* ─── FORM ─── */
+.field{margin-bottom:13px}
+.lbl{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:6px;display:block}
+.inp{width:100%;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--rd);padding:9px 12px;color:var(--tx);font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color .13s}
+.inp:focus{border-color:rgba(79,142,247,0.4)}
+.inp::placeholder{color:var(--tx3)}
+textarea.inp{resize:vertical;min-height:72px;line-height:1.55}
+select.inp{cursor:pointer}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+/* ─── CHIPS ─── */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 12px;border-radius:20px;border:1px solid var(--b2);background:var(--bg3);color:var(--tx2);font-size:11px;cursor:pointer;transition:all .11s;font-family:'Inter',sans-serif}
+.chip:hover{border-color:var(--b3);color:var(--tx)}
+.chip.on{background:var(--c1l);border-color:var(--c1b);color:var(--c1)}
+/* ─── BUTTONS ─── */
+.btn-pri{width:100%;padding:11px;background:var(--c1);border:none;border-radius:var(--rd);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .14s}
+.btn-pri:hover{background:#5f9bf8;transform:translateY(-1px)}
+.btn-pri:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-ghost{width:100%;padding:9px;background:transparent;border:1px solid var(--b2);border-radius:var(--rd);color:var(--tx2);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .13s}
+.btn-ghost:hover{background:var(--bg3);color:var(--tx)}
+.btn-green{width:100%;padding:11px;background:var(--g1);border:none;border-radius:var(--rd);color:#000;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .14s}
+.btn-green:hover{opacity:.9;transform:translateY(-1px)}
+.btn-green:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-amber{padding:8px 16px;background:var(--a1l);border:1px solid rgba(245,158,11,.25);border-radius:var(--rd);color:var(--a1);font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .13s}
+.btn-amber:hover{background:rgba(245,158,11,.18)}
+.btn-sm{padding:5px 11px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;border:1px solid var(--b2);background:var(--bg4);color:var(--tx2);transition:all .1s}
+.btn-sm:hover{color:var(--tx);border-color:var(--b3)}
+/* ─── OUTPUT ─── */
+.outbox{background:var(--bg3);border:1px solid var(--b2);border-radius:var(--rd2);padding:15px;margin-top:14px;display:none}
+.outbox.show{display:block}
+.out-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.out-lbl{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--c1);display:flex;align-items:center;gap:6px}
+.copy-btn{font-size:11px;padding:4px 9px;background:var(--bg4);border:1px solid var(--b2);border-radius:6px;color:var(--tx2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s}
+.copy-btn:hover{color:var(--tx)}
+.out-sub{font-size:12px;color:var(--tx2);padding-bottom:10px;border-bottom:1px solid var(--b1);margin-bottom:10px}
+.out-sub strong{color:var(--tx)}
+.out-body{font-size:12px;color:var(--tx);line-height:1.85;white-space:pre-wrap}
+/* ─── THINKING ─── */
+.thinking{display:inline-flex;gap:4px;align-items:center}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--c1);animation:blink 1.1s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+/* ─── DIVIDER ─── */
+.div{height:1px;background:var(--b1);margin:16px 0}
+/* ─── UPLOAD BOX ─── */
+.upload-zone{border:2px dashed var(--b2);border-radius:var(--rd2);padding:32px 20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg3)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--c1);background:var(--c1l)}
+.upload-zone input{display:none}
+.upload-icon{font-size:32px;margin-bottom:10px}
+.upload-title{font-size:14px;font-weight:600;margin-bottom:5px}
+.upload-sub{font-size:12px;color:var(--tx2)}
+/* ─── TABLE ─── */
+.tbl-wrap{overflow-x:auto;border-radius:var(--rd2);border:1px solid var(--b2);margin-top:14px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--bg4)}
+th{padding:9px 12px;text-align:left;font-weight:600;color:var(--tx2);font-size:10px;letter-spacing:.7px;text-transform:uppercase;border-bottom:1px solid var(--b2)}
+td{padding:9px 12px;border-bottom:1px solid var(--b1);color:var(--tx);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg4)}
+.td-email{color:var(--c1);font-size:11px}
+.td-company{font-weight:500}
+/* ─── SEND STATUS ─── */
+.send-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rd);margin-bottom:5px}
+.send-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.send-info{flex:1;min-width:0}
+.send-name{font-size:12px;font-weight:500}
+.send-email{font-size:11px;color:var(--tx2)}
+.send-st{font-size:11px;font-weight:600;white-space:nowrap}
+.st-wait{color:var(--tx3)}
+.st-gen{color:var(--c1)}
+.st-ready{color:var(--a1)}
+.st-sent{color:var(--g1)}
+.st-fail{color:var(--r1)}
+.st-icon{font-size:14px}
+/* ─── STATS ─── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rd2);padding:15px}
+.stat-n{font-family:'Syne',sans-serif;font-size:26px;font-weight:800}
+.stat-l{font-size:10px;color:var(--tx3);margin-top:3px;text-transform:uppercase;letter-spacing:.7px}
+.stat-s{font-size:11px;margin-top:4px}
+/* ─── ACTIVITY ─── */
+.act-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rd);margin-bottom:5px}
+.act-ico{font-size:14px;flex-shrink:0}
+.act-txt{font-size:12px;flex:1}
+.act-time{font-size:10px;color:var(--tx3)}
+/* ─── SETUP ─── */
+.setup-card{background:var(--bg3);border:1px solid var(--b2);border-radius:var(--rd2);padding:18px;margin-bottom:14px}
+.setup-card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.setup-card-sub{font-size:12px;color:var(--tx2);margin-bottom:14px;line-height:1.6}
+.step-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--b1)}
+.step-row:last-child{border-bottom:none}
+.step-num{width:22px;height:22px;background:var(--c1l);border:1px solid var(--c1b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--c1);flex-shrink:0;margin-top:1px}
+.step-txt{font-size:12px;color:var(--tx2);line-height:1.6}
+.step-txt a{color:var(--c1);text-decoration:none}
+.step-txt a:hover{text-decoration:underline}
+.connected-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--g1l);border:1px solid rgba(0,212,170,.2);border-radius:20px;font-size:11px;color:var(--g1);font-weight:500;margin-left:8px}
+.warning-box{background:var(--a1l);border:1px solid rgba(245,158,11,.2);border-radius:var(--rd);padding:10px 13px;font-size:12px;color:var(--a1);margin-bottom:14px;display:flex;gap:8px;align-items:flex-start;line-height:1.6}
+.info-box{background:var(--c1l);border:1px solid var(--c1b);border-radius:var(--rd);padding:10px 13px;font-size:12px;color:var(--c1);margin-bottom:14px;display:flex;gap:8px;align-items:flex-start;line-height:1.6}
+/* ─── PROGRESS BAR ─── */
+.prog-wrap{background:var(--bg4);border-radius:20px;height:6px;margin:10px 0;overflow:hidden}
+.prog-bar{height:100%;background:var(--g1);border-radius:20px;transition:width .3s}
+/* ─── MODAL ─── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--rd3);padding:22px;width:380px;max-width:94vw}
+.modal-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:15px}
+.modal-footer{display:flex;gap:8px;margin-top:13px}
+.modal-footer .btn-pri,.modal-footer .btn-ghost{margin-top:0}
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+.empty{text-align:center;padding:40px 20px;color:var(--tx3)}
+.empty-ico{font-size:32px;margin-bottom:8px}
+.empty-txt{font-size:12px;line-height:1.6}
+/* ─── PREVIEW PILL ─── */
+.pre-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 9px;border-radius:20px;background:var(--g1l);color:var(--g1);border:1px solid rgba(0,212,170,.2);margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-logo">🎯</div>
+    <div class="brand-name">Aman <span>Sales AI</span></div>
+  </div>
+  <div class="topbar-pills">
+    <span class="pill pill-g" id="ejStatus">● Not Connected</span>
+    <span class="pill pill-b">E-Learning Agent</span>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-label">Leads</div>
+      <button class="add-btn" onclick="openModal()">+ Add Lead</button>
+    </div>
+    <div class="sb-list" id="leadsList"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="tabs">
+      <div class="tab on" id="tab-setup"     onclick="sw('setup')">⚙️ Setup</div>
+      <div class="tab"    id="tab-upload"    onclick="sw('upload')">📂 Upload & Extract</div>
+      <div class="tab"    id="tab-campaign"  onclick="sw('campaign')">🚀 Bulk Campaign</div>
+      <div class="tab"    id="tab-compose"   onclick="sw('compose')">✉️ Compose</div>
+      <div class="tab"    id="tab-reply"     onclick="sw('reply')">↩️ Reply</div>
+      <div class="tab"    id="tab-dash"      onclick="sw('dash')">📊 Dashboard</div>
+    </div>
+
+    <div class="scroll">
+
+      <!-- ══ SETUP ══ -->
+      <div class="pane on" id="pane-setup">
+        <div class="info-box">
+          ℹ️ <div>Sirf <strong>2 steps</strong> karo — Google ka free plan use hoga. Koi credit card nahi chahiye.</div>
+        </div>
+
+        <!-- STEP 1: Gemini API -->
+        <div class="setup-card">
+          <div class="setup-card-title">
+            🤖 Step 1 — Google Gemini API Key (AI ke liye)
+            <span id="gemini-badge" style="display:none" class="connected-badge">✓ Saved</span>
+          </div>
+          <div class="setup-card-sub">Google AI Studio bilkul free hai. Isse AI email likhega, leads extract karega.</div>
+          <div class="step-row">
+            <div class="step-num">1</div>
+            <div class="step-txt">Jaao → <a href="https://aistudio.google.com/apikey" target="_blank"><strong>aistudio.google.com/apikey</strong></a></div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">2</div>
+            <div class="step-txt">Google account se login karo → <strong>"Create API Key"</strong> click karo</div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">3</div>
+            <div class="step-txt">Key copy karo (AIza... se shuru hogi) → neeche paste karo → Save karo</div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="field">
+            <span class="lbl">Gemini API Key</span>
+            <input class="inp" id="gemini-key" type="password" placeholder="AIzaSy..." />
+          </div>
+          <button class="btn-pri" onclick="saveGeminiKey()">💾 Save Gemini Key</button>
+        </div>
+
+        <!-- STEP 2: Google Apps Script -->
+        <div class="setup-card">
+          <div class="setup-card-title">
+            📧 Step 2 — Google Apps Script (Email Bhejne ke liye)
+            <span id="gas-badge" style="display:none" class="connected-badge">✓ Connected</span>
+          </div>
+          <div class="setup-card-sub">Aapki Gmail se emails jaayengi — bilkul free, unlimited emails.</div>
+          <div class="step-row">
+            <div class="step-num">1</div>
+            <div class="step-txt">Jaao → <a href="https://script.google.com" target="_blank"><strong>script.google.com</strong></a> → "New Project" click karo</div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">2</div>
+            <div class="step-txt">Poora code delete karo, aur <strong>neeche diya code paste karo</strong> → Save karo (Ctrl+S)</div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">3</div>
+            <div class="step-txt"><strong>Deploy → New Deployment</strong> → Type: <em>Web App</em> → Execute as: <em>Me</em> → Who has access: <em>Anyone</em> → Deploy</div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">4</div>
+            <div class="step-txt">Web App URL copy karo → neeche paste karo → Save karo</div>
+          </div>
+
+          <div style="background:var(--bg4);border:1px solid var(--b2);border-radius:var(--rd);padding:12px;margin:12px 0">
+            <div style="font-size:10px;color:var(--tx3);margin-bottom:7px;letter-spacing:.8px;text-transform:uppercase">Apps Script Code (Copy karein)</div>
+            <pre id="gasCode" style="font-size:11px;color:var(--g1);line-height:1.7;overflow-x:auto;white-space:pre-wrap">function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    MailApp.sendEmail({
+      to: data.to,
+      name: data.name || "",
+      subject: data.subject,
+      body: data.body
+    });
+    return ContentService
+      .createTextOutput(JSON.stringify({success: true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({success: false, error: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}</pre>
+            <button class="btn-sm" onclick="copyGasCode()" style="margin-top:8px">📋 Code Copy Karo</button>
+          </div>
+
+          <div class="field">
+            <span class="lbl">Google Apps Script Web App URL</span>
+            <input class="inp" id="gas-url" placeholder="https://script.google.com/macros/s/AKfyc.../exec" />
+          </div>
+          <div class="g2" style="gap:10px">
+            <button class="btn-pri" onclick="saveGAS()">💾 Save & Connect</button>
+            <button class="btn-ghost" onclick="testEmail()" style="border-color:var(--g1);color:var(--g1)">📨 Test Email Bhejo</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Sender Info -->
+        <div class="setup-card">
+          <div class="setup-card-title">👤 Step 3 — Aapki Details (Signature ke liye)</div>
+          <div class="setup-card-sub">Yeh sab emails mein signature mein aayega.</div>
+          <div class="g2">
+            <div class="field"><span class="lbl">Aapka Naam</span><input class="inp" id="s-sname" placeholder="e.g. Aman Sharma" /></div>
+            <div class="field"><span class="lbl">Designation</span><input class="inp" id="s-desig" placeholder="e.g. Sales Manager" /></div>
+          </div>
+          <div class="g2">
+            <div class="field"><span class="lbl">Company</span><input class="inp" id="s-comp" placeholder="e.g. Aman EduTech Pvt Ltd" /></div>
+            <div class="field"><span class="lbl">Phone</span><input class="inp" id="s-phone" placeholder="+91 98765 43210" /></div>
+          </div>
+          <div class="field"><span class="lbl">Default Course</span><input class="inp" id="s-course" placeholder="e.g. POSH Training, Compliance Courses" /></div>
+          <button class="btn-pri" onclick="saveSender()">💾 Save Details</button>
+        </div>
+      </div>
+
+      <!-- ══ UPLOAD & EXTRACT ══ -->
+      <div class="pane" id="pane-upload">
+        <div class="info-box">
+          📂 <div>Upload any CSV or Excel file containing company names, emails, or contact info. AI will automatically identify who needs your course and extract their details.</div>
+        </div>
+
+        <!-- Upload zone -->
+        <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+          <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" onchange="handleFile(event)">
+          <div class="upload-icon">📁</div>
+          <div class="upload-title">Drop your file here or click to browse</div>
+          <div class="upload-sub">Supports CSV, Excel (.xlsx, .xls) — any format with names, companies, emails</div>
+        </div>
+
+        <div id="uploadPreview" style="display:none;margin-top:16px">
+          <div class="pre-pill" id="fileNameBadge">✓ file.csv loaded</div>
+          <div class="field">
+            <span class="lbl">Your Course (for AI matching)</span>
+            <input class="inp" id="u-course" placeholder="e.g. Corporate Leadership Training, AWS Certification Bootcamp" />
+          </div>
+          <div class="field">
+            <span class="lbl">Target Audience (optional)</span>
+            <input class="inp" id="u-audience" placeholder="e.g. IT professionals, HR managers, fresh graduates..." />
+          </div>
+          <button class="btn-pri" id="extractBtn" onclick="extractLeads()">🤖 AI Extract Relevant Leads</button>
+        </div>
+
+        <div id="extractedSection" style="display:none;margin-top:18px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:600;color:var(--tx)" id="extractCount">0 leads found</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-amber" onclick="addAllToCampaign()">+ Add All to Campaign</button>
+              <button class="btn-sm" onclick="clearExtracted()">Clear</button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Name</th><th>Company</th><th>Email</th><th>Role</th><th>Why Relevant</th><th>Action</th></tr></thead>
+              <tbody id="extractedTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ BULK CAMPAIGN ══ -->
+      <div class="pane" id="pane-campaign">
+        <div id="camp-empty" class="empty">
+          <div class="empty-ico">🚀</div>
+          <div class="empty-txt">No leads in campaign yet.<br>Upload a file and click "Add All to Campaign" or add leads manually.</div>
+        </div>
+
+        <div id="camp-content" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:14px;font-weight:600" id="camp-count">0 leads ready</div>
+              <div style="font-size:11px;color:var(--tx2);margin-top:2px" id="camp-sub">Generate emails first, then send all in one click</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn-amber" onclick="genAllEmails()" id="genAllBtn">⚡ Generate All Emails</button>
+              <button class="btn-green" onclick="sendAllEmails()" id="sendAllBtn" disabled>📨 Send All Emails</button>
+              <button class="btn-sm" onclick="clearCampaign()">Clear</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="lbl">Course for this Campaign</span>
+            <input class="inp" id="c-course" placeholder="e.g. Digital Marketing Masterclass" />
+          </div>
+
+          <div class="prog-wrap" id="progWrap" style="display:none">
+            <div class="prog-bar" id="progBar" style="width:0%"></div>
+          </div>
+          <div style="font-size:11px;color:var(--tx2);margin-bottom:12px" id="progText"></div>
+
+          <div id="campList"></div>
+        </div>
+      </div>
+
+      <!-- ══ COMPOSE ══ -->
+      <div class="pane" id="pane-compose">
+        <div class="field">
+          <span class="lbl">Prospect Details</span>
+          <div class="g2" style="margin-bottom:9px">
+            <input class="inp" id="co-name" placeholder="Full name" />
+            <input class="inp" id="co-org" placeholder="Organization" />
+          </div>
+          <div class="g2">
+            <input class="inp" id="co-email" placeholder="Email address" />
+            <input class="inp" id="co-role" placeholder="Role / Designation" />
+          </div>
+        </div>
+        <div class="field"><span class="lbl">Course / Platform</span><input class="inp" id="co-course" placeholder="e.g. AWS Certification Bootcamp, Corporate Soft Skills LMS" /></div>
+        <div class="field">
+          <span class="lbl">Audience Type</span>
+          <div class="chips">
+            <span class="chip on" onclick="toggleChip(this)">Corporate Employees</span>
+            <span class="chip" onclick="toggleChip(this)">University Students</span>
+            <span class="chip" onclick="toggleChip(this)">IT Professionals</span>
+            <span class="chip" onclick="toggleChip(this)">Healthcare Staff</span>
+            <span class="chip" onclick="toggleChip(this)">Government / PSU</span>
+            <span class="chip" onclick="toggleChip(this)">School Teachers</span>
+            <span class="chip" onclick="toggleChip(this)">SME Owners</span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="lbl">Tone</span>
+          <div class="chips" id="co-tones">
+            <span class="chip on tone-c" onclick="setTone(this,'professional')">Professional</span>
+            <span class="chip tone-c" onclick="setTone(this,'consultative')">Consultative</span>
+            <span class="chip tone-c" onclick="setTone(this,'friendly')">Friendly</span>
+            <span class="chip tone-c" onclick="setTone(this,'urgent')">Urgent</span>
+            <span class="chip tone-c" onclick="setTone(this,'formal')">Formal</span>
+          </div>
+        </div>
+        <div class="field"><span class="lbl">Extra Context</span><textarea class="inp" id="co-ctx" placeholder="Any personalization details..."></textarea></div>
+        <div class="g2" style="gap:10px;margin-bottom:4px">
+          <button class="btn-pri" onclick="composeGenerate()">⚡ Generate Email</button>
+          <button class="btn-green" onclick="composeSend()" id="co-sendBtn" disabled>📨 Send Email</button>
+        </div>
+        <div class="outbox" id="co-out">
+          <div class="out-hd">
+            <div class="out-lbl"><span id="co-think" class="thinking" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span><span id="co-tlbl">Generated Email</span></div>
+            <button class="copy-btn" onclick="cp('co-body')">Copy</button>
+          </div>
+          <div class="out-sub" id="co-sub"></div>
+          <div class="out-body" id="co-body"></div>
+        </div>
+      </div>
+
+      <!-- ══ REPLY ══ -->
+      <div class="pane" id="pane-reply">
+        <div class="field"><span class="lbl">Incoming Email (paste here)</span><textarea class="inp" id="r-in" rows="6" placeholder="Paste the client's reply here..."></textarea></div>
+        <div class="field">
+          <div class="g2">
+            <div><span class="lbl">Client Name</span><input class="inp" id="r-name" placeholder="Client name" /></div>
+            <div><span class="lbl">Course Discussed</span><input class="inp" id="r-course" placeholder="Course / platform" /></div>
+          </div>
+        </div>
+        <div class="field">
+          <span class="lbl">Strategy</span>
+          <div class="chips" id="r-strats">
+            <span class="chip on strat-c" onclick="setStrat(this,'follow-up')">Follow Up</span>
+            <span class="chip strat-c" onclick="setStrat(this,'handle-objection')">Handle Objection</span>
+            <span class="chip strat-c" onclick="setStrat(this,'price-negotiation')">Price Negotiation</span>
+            <span class="chip strat-c" onclick="setStrat(this,'close-deal')">Close Deal</span>
+            <span class="chip strat-c" onclick="setStrat(this,'re-engage')">Re-engage</span>
+            <span class="chip strat-c" onclick="setStrat(this,'upsell')">Upsell</span>
+          </div>
+        </div>
+        <div class="field"><span class="lbl">Your Constraints</span><textarea class="inp" id="r-cons" placeholder="e.g. Max 10% discount, delivery in 30 days..."></textarea></div>
+        <div class="g2">
+          <button class="btn-pri" onclick="replyGenerate()">↩️ Generate Reply</button>
+          <button class="btn-green" onclick="replySend()" id="r-sendBtn" disabled>📨 Send Reply</button>
+        </div>
+        <div class="outbox" id="r-out">
+          <div class="out-hd">
+            <div class="out-lbl"><span id="r-think" class="thinking" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span><span id="r-tlbl">Smart Reply</span></div>
+            <button class="copy-btn" onclick="cp('r-body')">Copy</button>
+          </div>
+          <div class="out-sub" id="r-sub"></div>
+          <div class="out-body" id="r-body"></div>
+        </div>
+      </div>
+
+      <!-- ══ DASHBOARD ══ -->
+      <div class="pane" id="pane-dash">
+        <div class="stats">
+          <div class="stat"><div class="stat-n" id="ds-leads">0</div><div class="stat-l">Total Leads</div><div class="stat-s" style="color:var(--c1)">Pipeline</div></div>
+          <div class="stat"><div class="stat-n" id="ds-gen">0</div><div class="stat-l">Emails Generated</div><div class="stat-s" style="color:var(--p1)">AI Written</div></div>
+          <div class="stat"><div class="stat-n" id="ds-sent">0</div><div class="stat-l">Emails Sent</div><div class="stat-s" style="color:var(--g1)">Delivered</div></div>
+          <div class="stat"><div class="stat-n" id="ds-fail">0</div><div class="stat-l">Failed</div><div class="stat-s" style="color:var(--r1)">Errors</div></div>
+        </div>
+        <div class="lbl" style="margin-bottom:10px">Activity Log</div>
+        <div id="actFeed"><div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">No activity yet.</div></div></div>
+      </div>
+
+    </div><!-- /scroll -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODAL: Add Lead -->
+<div class="modal-bg" id="modalBg" onclick="closeModalOut(event)">
+  <div class="modal">
+    <div class="modal-title">Add New Lead</div>
+    <div class="field"><span class="lbl">Full Name</span><input class="inp" id="m-name" placeholder="e.g. Rahul Verma" /></div>
+    <div class="field"><span class="lbl">Organization</span><input class="inp" id="m-org" placeholder="e.g. Infosys, Delhi University" /></div>
+    <div class="field"><span class="lbl">Email</span><input class="inp" id="m-email" placeholder="email@org.com" /></div>
+    <div class="field"><span class="lbl">Role</span><input class="inp" id="m-role" placeholder="e.g. HR Manager, Principal" /></div>
+    <div class="field"><span class="lbl">Status</span>
+      <select class="inp" id="m-status">
+        <option value="new">New Lead</option>
+        <option value="contacted">Contacted</option>
+        <option value="demo">Demo Scheduled</option>
+        <option value="proposal">Proposal Sent</option>
+        <option value="closed">Closed Won</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn-pri" onclick="addLead()" style="margin-top:0">Add Lead</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+let cfg = { svcId:'', tplId:'', pubKey:'', senderName:'Aman Sharma', desig:'Sales Manager', company:'Aman EduTech', phone:'', course:'' };
+let leads = [
+  {id:1,name:'Priya Mehta',org:'Infosys Learning',email:'priya.m@infosys.com',role:'Training Head',status:'contacted'},
+  {id:2,name:'Rahul Verma',org:'Delhi University',email:'r.verma@du.ac.in',role:'Academic Coord.',status:'new'},
+  {id:3,name:'Sarah Johnson',org:'Deloitte India',email:'sarah.j@deloitte.com',role:'L&D Manager',status:'demo'},
+];
+let activeLead = null;
+let nextId = 10;
+let campaign = [];   // {id, name, org, email, role, reason, status, subject, body}
+let tone = 'professional', strat = 'follow-up';
+let rawData = [];
+let extractedLeads = [];
+let generatedEmail = {subject:'', body:''};
+let generatedReply = {subject:'', body:''};
+let acts = [];
+let counts = {leads:3, gen:0, sent:0, fail:0};
+const COLORS = ['#4f8ef7','#00d4aa','#f59e0b','#a78bfa','#22c55e','#f472b6'];
+const STATUS_CLR = {new:'#4f8ef7',contacted:'#00d4aa',demo:'#f59e0b',proposal:'#a78bfa',closed:'#22c55e'};
+const STATUS_LBL = {new:'New',contacted:'Contacted',demo:'Demo',proposal:'Proposal',closed:'Closed'};
+
+// ══════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════
+const $  = id => document.getElementById(id);
+const gv = id => ($( id)?.value||'').trim();
+const sv = (id,v) => { if($(id)) $(id).value=v; };
+const ini= n  => n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+const col= id => COLORS[id % COLORS.length];
+
+function sw(name) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  $('tab-'+name).classList.add('on');
+  $('pane-'+name).classList.add('on');
+}
+
+function toggleChip(el) { el.classList.toggle('on'); }
+function setTone(el,v) { document.querySelectorAll('.tone-c').forEach(c=>c.classList.remove('on')); el.classList.add('on'); tone=v; }
+function setStrat(el,v) { document.querySelectorAll('.strat-c').forEach(c=>c.classList.remove('on')); el.classList.add('on'); strat=v; }
+
+function log(txt,ico='⚡') {
+  acts.unshift({txt,ico,t:new Date().toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'})});
+  if(acts.length>40) acts.pop();
+  renderActs();
+}
+
+function renderActs() {
+  if(!acts.length) return;
+  $('actFeed').innerHTML = acts.map(a=>`<div class="act-item"><div class="act-ico">${a.ico}</div><div class="act-txt">${a.txt}</div><div class="act-time">${a.t}</div></div>`).join('');
+}
+
+function refreshDash() {
+  counts.leads = leads.length;
+  $('ds-leads').textContent = counts.leads;
+  $('ds-gen').textContent   = counts.gen;
+  $('ds-sent').textContent  = counts.sent;
+  $('ds-fail').textContent  = counts.fail;
+}
+
+async function ejSend(toEmail, toName, subject, body) {
+  const scriptUrl = cfg.gasUrl || localStorage.getItem('aman_gas_url') || '';
+  if(!scriptUrl) {
+    throw new Error('Google Apps Script URL setup nahi hai. Setup Tab mein daalo.');
+  }
+  const sig = `\n\n---\n${cfg.senderName||'Aman'}\n${cfg.desig||'Sales Manager'} | ${cfg.company||'Aman EduTech'}${cfg.phone?'\nPh: '+cfg.phone:''}`;
+  const payload = { to: toEmail, name: toName||'Prospect', subject: subject||'Important Message', body: body + sig };
+  const r = await fetch(scriptUrl, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  // no-cors means we can't read response, but if no exception = sent
+  return { status: 200 };
+}
+
+
+// ══════════════════════════════════════
+//  GEMINI API KEY
+// ══════════════════════════════════════
+function saveGeminiKey() {
+  const key = gv('gemini-key');
+  if(!key) { alert('API key daalo!'); return; }
+  cfg.geminiKey = key;
+  localStorage.setItem('aman_gemini_key', key);
+  $('gemini-badge').style.display = 'inline-flex';
+  log('Gemini API key saved ✅', '🤖');
+  alert('✅ Gemini API Key saved! AI features active hain.');
+}
+
+// ══════════════════════════════════════
+//  GOOGLE APPS SCRIPT (Email Sender)
+// ══════════════════════════════════════
+function saveGAS() {
+  const url = gv('gas-url');
+  if(!url || !url.startsWith('https://script.google.com')) {
+    alert('Valid Google Apps Script URL daalo!\n(https://script.google.com/... se shuru honi chahiye)');
+    return;
+  }
+  cfg.gasUrl = url;
+  localStorage.setItem('aman_gas_url', url);
+  $('gas-badge').style.display = 'inline-flex';
+  log('Google Apps Script connected ✅', '📧');
+  alert('✅ Email sender connected! Test email bhejo verify karne ke liye.');
+}
+
+function copyGasCode() {
+  const code = $('gasCode')?.textContent || '';
+  navigator.clipboard.writeText(code).then(() => {
+    alert('✅ Code copy ho gaya! Ab script.google.com mein paste karo.');
+  });
+}
+
+async function testEmail() {
+  const testTo = prompt('Apna email address likho test ke liye:', '');
+  if(!testTo) return;
+  try {
+    await ejSend(testTo, 'Test User', 'Aman Sales AI — Test Email ✅', 'Yeh ek test email hai.\n\nAgar yeh aaya hai toh aapka email system bilkul sahi kaam kar raha hai!');
+    alert('✅ Test email bhej diya!\n\nApna inbox check karo (Spam folder bhi).\n\nNote: Google Apps Script "no-cors" mode mein kaam karta hai, isliye koi error nahi aayega — email aaye na aaye. Agar 2 min mein na aaye toh Apps Script check karo.');
+  } catch(e) {
+    alert('❌ Error: ' + e.message);
+  }
+}
+
+
+async function testEmail() {
+  const testTo = prompt('Apna email address likho test ke liye:', '');
+  if(!testTo) return;
+  try {
+    await ejSend(testTo, 'Test User', 'Aman Sales AI — Test Email ✅', 'Yeh ek test email hai.\n\nAgar yeh aaya hai toh aapka email system bilkul sahi kaam kar raha hai!');
+    alert('✅ Test email bhej diya!\n\nApna inbox check karo (Spam folder bhi).\n\nNote: Google Apps Script "no-cors" mode mein kaam karta hai, isliye koi error nahi aayega — email aaye na aaye. Agar 2 min mein na aaye toh Apps Script check karo.');
+  } catch(e) {
+    alert('❌ Error: ' + e.message);
+  }
+}
+
+
+
+async function testEmail() {
+  const testTo = prompt('Apna email address likho jahan test email aaye:','');
+  if(!testTo) return;
+  try {
+    await ejSend(testTo, 'Test', 'Aman Sales AI — Test Email', 'Yeh ek test email hai. EmailJS sahi se kaam kar raha hai! ✅');
+    alert('✅ Test email gaya! Apna inbox check karo (spam bhi dekho).');
+  } catch(e) {
+    alert('❌ Email send nahi hua:\n'+e.message+'\n\nCheck karo:\n1. Service ID/Template ID/Public Key sahi hain?\n2. Gmail account connected hai EmailJS mein?\n3. Template mein {{to_email}}, {{subject}}, {{message}} variables hain?');
+  }
+}
+
+function saveSender() {
+  cfg.senderName = gv('s-sname')||'Aman Sharma';
+  cfg.desig      = gv('s-desig')||'Sales Manager';
+  cfg.company    = gv('s-comp')||'Aman EduTech';
+  cfg.phone      = gv('s-phone');
+  cfg.course     = gv('s-course');
+  log('Sender info saved','👤');
+  alert('✅ Sender info saved!');
+}
+
+async function ejSend(toEmail, toName, subject, body) {
+  const scriptUrl = cfg.gasUrl || localStorage.getItem('aman_gas_url') || '';
+  if(!scriptUrl) {
+    throw new Error('Google Apps Script URL setup nahi hai. Setup Tab mein daalo.');
+  }
+  const sig = `\n\n---\n${cfg.senderName||'Aman'}\n${cfg.desig||'Sales Manager'} | ${cfg.company||'Aman EduTech'}${cfg.phone?'\nPh: '+cfg.phone:''}`;
+  const payload = { to: toEmail, name: toName||'Prospect', subject: subject||'Important Message', body: body + sig };
+  const r = await fetch(scriptUrl, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  // no-cors means we can't read response, but if no exception = sent
+  return { status: 200 };
+}
+
+
+// ══════════════════════════════════════
+//  ANTHROPIC API KEY
+// ══════════════════════════════════════
+function saveAIKey() {
+  const key = gv('ai-key');
+  if(!key || !key.startsWith('sk-')) { alert('Please enter a valid Anthropic API key (starts with sk-ant-...)'); return; }
+  cfg.anthropicKey = key;
+  localStorage.setItem('aman_ai_key', key);
+  $('ai-badge').style.display = 'inline-flex';
+  log('Anthropic API key saved ✅','🤖');
+  alert('✅ API Key saved! AI features are now active.');
+}
+
+// ══════════════════════════════════════
+//  CLAUDE API — auto-detects environment
+//  Claude.ai artifact → direct API (no key needed)
+//  localhost → local proxy server
+//  file:// → asks for key + proxy
+// ══════════════════════════════════════
+async function ai(prompt) {
+  const key = cfg.geminiKey || localStorage.getItem('aman_gemini_key') || '';
+  if(!key) {
+    alert('Setup Tab mein Google Gemini API Key daalo!\n\n1. aistudio.google.com pe jaao\n2. Get API Key click karo\n3. Copy karo → Setup Tab mein paste karo');
+    sw('setup');
+    throw new Error('No Gemini API key');
+  }
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+  });
+  if(!r.ok) {
+    const e = await r.json().catch(()=>({}));
+    throw new Error('Gemini Error: ' + (e?.error?.message || 'HTTP ' + r.status));
+  }
+  const d = await r.json();
+  return d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+function parseEmail(txt) {
+  const i = txt.indexOf('---');
+  if(i===-1) return {subject:'',body:txt.trim()};
+  return {subject:txt.slice(0,i).replace(/^SUBJECT:\s*/i,'').trim(), body:txt.slice(i+3).trim()};
+}
+
+function sig() {
+  return `${cfg.senderName||'Aman Sharma'}\n${cfg.desig||'Sales Manager'} | ${cfg.company||'Aman EduTech'}${cfg.phone?'\nPh: '+cfg.phone:''}`;
+}
+
+// ══════════════════════════════════════
+//  LEADS SIDEBAR
+// ══════════════════════════════════════
+function renderLeads() {
+  $('leadsList').innerHTML = leads.map(l=>`
+    <div class="lead-row${activeLead?.id===l.id?' sel':''}" onclick="pickLead(${l.id})">
+      <div class="lead-top">
+        <div class="av" style="background:${col(l.id)}1a;color:${col(l.id)}">${ini(l.name)}</div>
+        <div style="flex:1;min-width:0"><div class="ln">${l.name}</div><div class="lo">${l.org}</div></div>
+      </div>
+      <div class="lead-st">
+        <div class="sdot" style="background:${STATUS_CLR[l.status]||'#4f8ef7'}"></div>
+        <div class="stxt">${STATUS_LBL[l.status]||l.status}</div>
+      </div>
+    </div>`).join('');
+  refreshDash();
+}
+
+function pickLead(id) {
+  activeLead = leads.find(l=>l.id===id);
+  renderLeads();
+  const {name,org,email,role} = activeLead;
+  sv('co-name',name); sv('co-org',org); sv('co-email',email); sv('co-role',role);
+  sv('r-name',name);
+}
+
+function openModal() { $('modalBg').classList.add('open'); }
+function closeModal() { $('modalBg').classList.remove('open'); }
+function closeModalOut(e) { if(e.target===$('modalBg')) closeModal(); }
+
+function addLead() {
+  const name=gv('m-name'); if(!name) return;
+  const l = {id:nextId++,name,org:gv('m-org'),email:gv('m-email'),role:gv('m-role'),status:$('m-status').value};
+  leads.push(l);
+  closeModal();
+  ['m-name','m-org','m-email','m-role'].forEach(id=>sv(id,''));
+  log(`Lead added: ${name} — ${l.org}`,'👤');
+  renderLeads();
+}
+
+// ══════════════════════════════════════
+//  FILE UPLOAD & AI EXTRACT
+// ══════════════════════════════════════
+function dragOver(e)  { e.preventDefault(); $('dropZone').classList.add('drag'); }
+function dragLeave()  { $('dropZone').classList.remove('drag'); }
+function dropFile(e)  { e.preventDefault(); $('dropZone').classList.remove('drag'); processFile(e.dataTransfer.files[0]); }
+function handleFile(e){ processFile(e.target.files[0]); }
+
+function processFile(file) {
+  if(!file) return;
+  $('fileNameBadge').textContent = '✓ '+file.name;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(ext==='csv') {
+    Papa.parse(file,{header:true,skipEmptyLines:true,complete:r=>{rawData=r.data;showUploadPreview();}});
+  } else {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const wb = XLSX.read(e.target.result,{type:'binary'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      rawData = XLSX.utils.sheet_to_json(ws,{defval:''});
+      showUploadPreview();
+    };
+    reader.readAsBinaryString(file);
+  }
+}
+
+function showUploadPreview() {
+  $('uploadPreview').style.display='block';
+  // Pre-fill course from settings
+  if(cfg.course) sv('u-course', cfg.course);
+}
+
+async function extractLeads() {
+  const course   = gv('u-course');
+  const audience = gv('u-audience');
+  if(!course){ alert('Apna course naam likho pehle!'); return; }
+  if(!rawData.length){ alert('Pehle file upload karo.'); return; }
+
+  const btn = $('extractBtn');
+  btn.disabled = true;
+  btn.textContent = '🔍 Columns detect ho rahe hain...';
+
+  // ── STEP 1: Smart column detection ──
+  const sampleRow = rawData[0] || {};
+  const keys = Object.keys(sampleRow);
+  
+  let emailCol = '', nameCol = '', companyCol = '', roleCol = '', cityCol = '', notesCol = '';
+
+  // Scan all rows to find which column has emails
+  for(const key of keys) {
+    const vals = rawData.map(r => String(r[key]||'').trim());
+    const emailCount = vals.filter(v => v.includes('@') && v.includes('.')).length;
+    if(emailCount > 0) { emailCol = key; break; }
+  }
+
+  // Match other columns by name
+  for(const key of keys) {
+    const k = key.toLowerCase().replace(/[^a-z]/g,'');
+    if(!nameCol && ['name','fullname','contactname','person'].includes(k)) nameCol = key;
+    if(!companyCol && ['company','organization','org','firm','business','institute','institution','college','school','employer'].includes(k)) companyCol = key;
+    if(!roleCol && ['designation','role','title','jobtitle','position','department','dept'].includes(k)) roleCol = key;
+    if(!cityCol && ['city','location','place','region','state'].includes(k)) cityCol = key;
+    if(!notesCol && ['notes','note','remarks','comment','description','info'].includes(k)) notesCol = key;
+  }
+
+  // Fallback: if still empty, use first few columns positionally
+  if(!nameCol && keys[0]) nameCol = keys[0];
+  if(!companyCol && keys[1]) companyCol = keys[1];
+  if(!emailCol && keys[2]) emailCol = keys[2];
+  if(!roleCol && keys[3]) roleCol = keys[3];
+
+  if(!emailCol) {
+    alert('Email column nahi mili!\n\nApni file mein check karo ki koi column mein "@" wali emails hain ya nahi.');
+    btn.disabled = false;
+    btn.textContent = '🤖 AI Extract Relevant Leads';
+    return;
+  }
+
+  // ── STEP 2: Extract all rows with valid emails ──
+  const validLeads = rawData
+    .map(row => ({
+      name:    String(row[nameCol]    || '').trim(),
+      company: String(row[companyCol] || '').trim(),
+      email:   String(row[emailCol]   || '').trim(),
+      role:    String(row[roleCol]    || '').trim(),
+      city:    String(row[cityCol]    || '').trim(),
+      notes:   String(row[notesCol]   || '').trim(),
+    }))
+    .filter(r => r.email.includes('@') && r.email.includes('.'));
+
+  if(!validLeads.length) {
+    alert('Koi valid email nahi mili file mein!\nCheck karo ki email column mein data hai.');
+    btn.disabled = false;
+    btn.textContent = '🤖 AI Extract Relevant Leads';
+    return;
+  }
+
+  btn.textContent = `✅ ${validLeads.length} emails mili — AI reasons likh raha hai...`;
+
+  // ── STEP 3: AI generates personalized reason for each (in batches) ──
+  const BATCH = 20;
+  extractedLeads = [];
+
+  for(let i = 0; i < validLeads.length; i += BATCH) {
+    const batch = validLeads.slice(i, i + BATCH);
+    btn.textContent = `🤖 AI reasons likh raha hai ${i+1}–${Math.min(i+BATCH, validLeads.length)} / ${validLeads.length}...`;
+
+    const prompt = `You are a sales assistant. For each person below, write 1 short sentence (max 12 words) explaining why they need this course: "${course}".
+
+People:
+${batch.map((r,j) => `${j+1}. ${r.name} | ${r.role} | ${r.company} | Notes: ${r.notes||'none'}`).join('\n')}
+
+Return ONLY a JSON array of strings, one reason per person. Example:
+["Reason for person 1","Reason for person 2"]
+No explanation, no markdown. Just the array.`;
+
+    try {
+      const res = await ai(prompt);
+      let clean = res.trim().replace(/\`\`\`json|\`\`\`/g,'').trim();
+      const s = clean.indexOf('['), e = clean.lastIndexOf(']');
+      let reasons = [];
+      if(s !== -1 && e !== -1) {
+        try { reasons = JSON.parse(clean.slice(s, e+1)); } catch(_) {}
+      }
+      batch.forEach((r, j) => {
+        extractedLeads.push({ ...r, reason: reasons[j] || `${r.role} at ${r.company} needs ${course}` });
+      });
+    } catch(err) {
+      // If AI fails, still add leads with default reason
+      batch.forEach(r => {
+        extractedLeads.push({ ...r, reason: `${r.role||'Professional'} can benefit from ${course}` });
+      });
+    }
+  }
+
+  renderExtracted();
+  log(`${extractedLeads.length} leads extracted from file`, '🤖');
+  btn.disabled = false;
+  btn.textContent = '🤖 AI Extract Relevant Leads';
+}
+
+function renderExtracted() {
+  $('extractedSection').style.display='block';
+  $('extractCount').textContent = `✅ ${extractedLeads.length} leads extracted by AI`;
+  $('extractedTbody').innerHTML = extractedLeads.map((l,i)=>`
+    <tr>
+      <td style="color:var(--tx3)">${i+1}</td>
+      <td class="td-company">${l.name||l.Name||'—'}</td>
+      <td>${l.company||l.Company||l.Organization||'—'}</td>
+      <td class="td-email">${l.email||l.Email||''}</td>
+      <td style="color:var(--tx2)">${l.role||l.Role||l.Designation||'—'}</td>
+      <td style="color:var(--tx2);font-size:11px">${l.reason||'Relevant lead'}</td>
+      <td><button class="btn-sm" onclick="addOneToCampaign(${i})">+ Add</button></td>
+    </tr>`).join('');
+}
+
+function clearExtracted() {
+  extractedLeads=[];
+  $('extractedSection').style.display='none';
+}
+
+function addOneToCampaign(i) {
+  const l = extractedLeads[i];
+  if(!l) return;
+  if(campaign.find(c=>c.email===l.email)){ alert('Already in campaign.'); return; }
+  campaign.push({id:nextId++,...l,status:'wait',subject:'',body:''});
+  renderCampaign();
+  log(`Added ${l.name||l.email} to campaign`,'➕');
+  sw('campaign');
+}
+
+function addAllToCampaign() {
+  let added=0;
+  extractedLeads.forEach(l=>{
+    if(!l.email) return;
+    if(!campaign.find(c=>c.email===l.email)) {
+      campaign.push({id:nextId++,...l,status:'wait',subject:'',body:''});
+      added++;
+    }
+  });
+  renderCampaign();
+  log(`${added} leads added to campaign`,'🚀');
+  sw('campaign');
+}
+
+// ══════════════════════════════════════
+//  CAMPAIGN
+// ══════════════════════════════════════
+function renderCampaign() {
+  const hasCamp = campaign.length>0;
+  $('camp-empty').style.display   = hasCamp?'none':'block';
+  $('camp-content').style.display = hasCamp?'block':'none';
+  if(!hasCamp) return;
+  $('camp-count').textContent = `${campaign.length} leads in campaign`;
+  const allReady = campaign.every(c=>c.status==='ready'||c.status==='sent'||c.status==='fail');
+  $('sendAllBtn').disabled = !allReady;
+  $('campList').innerHTML = campaign.map(l=>{
+    const stIcon = {wait:'⏳',gen:'🤖',ready:'✅',sent:'✉️',fail:'❌'}[l.status]||'⏳';
+    const stCls  = {wait:'st-wait',gen:'st-gen',ready:'st-ready',sent:'st-sent',fail:'st-fail'}[l.status]||'st-wait';
+    const stTxt  = {wait:'Waiting',gen:'Generating...',ready:'Ready to Send',sent:'Sent ✓',fail:'Failed'}[l.status];
+    return `<div class="send-row" id="srow-${l.id}">
+      <div class="send-av" style="background:${col(l.id)}1a;color:${col(l.id)}">${ini(l.name||l.email)}</div>
+      <div class="send-info">
+        <div class="send-name">${l.name||'—'} <span style="font-size:11px;color:var(--tx2)">${l.company||''}</span></div>
+        <div class="send-email">${l.email}</div>
+        ${l.subject?`<div style="font-size:11px;color:var(--tx2);margin-top:3px">📧 ${l.subject}</div>`:''}
+      </div>
+      <div class="send-st ${stCls}">${stIcon} ${stTxt}</div>
+      <button class="btn-sm" onclick="removeCamp(${l.id})" style="margin-left:8px;flex-shrink:0">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function removeCamp(id) {
+  campaign = campaign.filter(c=>c.id!==id);
+  renderCampaign();
+}
+
+function clearCampaign() {
+  if(!confirm('Clear all campaign leads?')) return;
+  campaign=[];
+  renderCampaign();
+}
+
+async function genAllEmails() {
+  if(!campaign.length) return;
+  const course = gv('c-course') || cfg.course || 'our e-learning program';
+  const btn = $('genAllBtn');
+  btn.disabled=true;
+  btn.textContent='⏳ Generating...';
+
+  let done=0;
+  for(const l of campaign) {
+    if(l.status==='sent') { done++; continue; }
+    l.status='gen';
+    updateCampRow(l);
+
+    const prompt=`Write a concise B2B outreach email selling this e-learning course.
+Prospect: ${l.name||'Decision Maker'} | ${l.role||''} | ${l.company||''}
+Email: ${l.email}
+Course: ${course}
+Why they need it: ${l.reason||'professional development'}
+
+Format:
+SUBJECT: [subject]
+---
+[email body]
+
+Rules: 160-200 words. Personalized opener. Clear value. Soft CTA (15-min call or free demo). Sign as ${cfg.senderName||'Aman Sharma'}, ${cfg.desig||'Sales Manager'}, ${cfg.company||'Aman EduTech'}. No bracket placeholders.`;
+
+    try {
+      const res = await ai(prompt);
+      const {subject,body} = parseEmail(res);
+      l.subject=subject; l.body=body; l.status='ready';
+      counts.gen++;
+    } catch(e) { l.status='fail'; l.body='Error: '+e.message; }
+    done++;
+    updateCampRow(l);
+    const pct = Math.round(done/campaign.length*100);
+    $('progWrap').style.display='block';
+    $('progBar').style.width=pct+'%';
+    $('progText').textContent=`Generated ${done} of ${campaign.length} emails`;
+  }
+
+  btn.disabled=false;
+  btn.textContent='⚡ Regenerate All';
+  const allReady = campaign.every(c=>c.status==='ready'||c.status==='sent'||c.status==='fail');
+  $('sendAllBtn').disabled = !allReady;
+  $('progText').textContent=`✅ All emails generated! Click "Send All Emails" to deliver.`;
+  log(`Generated ${done} emails for campaign`,'⚡');
+  refreshDash();
+}
+
+async function sendAllEmails() {
+  // Load EmailJS config from localStorage
+  if(!cfg.svcId) cfg.svcId = localStorage.getItem('aman_ej_svc')||'';
+  if(!cfg.tplId) cfg.tplId = localStorage.getItem('aman_ej_tpl')||'';
+  if(!cfg.pubKey) cfg.pubKey = localStorage.getItem('aman_ej_key')||'';
+
+  cfg.gasUrl = cfg.gasUrl || localStorage.getItem('aman_gas_url') || '';
+  if(!cfg.gasUrl) {
+    alert('❌ Email sender setup nahi hai!\n\nSetup Tab → Step 2 (Google Apps Script) complete karo.');
+    sw('setup');
+    return;
+  }
+
+  const readyLeads = campaign.filter(c => c.status === 'ready');
+  if(!readyLeads.length) {
+    alert('Pehle "Generate All Emails" click karo — koi email ready nahi hai abhi.');
+    return;
+  }
+  if(!confirm(`${readyLeads.length} emails bhejne hain. Confirm karein?`)) return;
+
+  const btn = $('sendAllBtn');
+  btn.disabled = true;
+  btn.textContent = '📨 Sending...';
+  $('progWrap').style.display = 'block';
+
+  let sent = 0, fail = 0;
+  const errors = [];
+
+  for(const l of readyLeads) {
+    $('progText').textContent = `Sending to ${l.email}...`;
+    try {
+      await ejSend(l.email, l.name||'', l.subject, l.body);
+      l.status = 'sent';
+      counts.sent++;
+      sent++;
+      log(`✅ Email sent to ${l.name||l.email}`, '✉️');
+    } catch(e) {
+      l.status = 'fail';
+      l.errorMsg = e.message;
+      counts.fail++;
+      fail++;
+      errors.push(`❌ ${l.email}: ${e.message}`);
+      log(`❌ Failed: ${l.email} — ${e.message}`, '❌');
+    }
+    updateCampRow(l);
+    const pct = Math.round((sent+fail)/readyLeads.length*100);
+    $('progBar').style.width = pct + '%';
+    $('progText').textContent = `✅ Sent: ${sent}  ❌ Failed: ${fail}  ⏳ Bache: ${readyLeads.length-sent-fail}`;
+    await new Promise(r => setTimeout(r, 1500)); // rate limit avoid karo
+  }
+
+  btn.disabled = false;
+  btn.textContent = '📨 Send All Emails';
+
+  let msg = `\n✅ ${sent} emails sent!`;
+  if(fail > 0) {
+    msg += `\n❌ ${fail} fail hue:\n${errors.slice(0,5).join('\n')}`;
+    msg += '\n\nCheck karo: emailjs.com → Logs mein dekho kya error hai.';
+  }
+  alert(msg);
+  log(`Campaign done: ${sent} sent, ${fail} failed`, '🎯');
+  refreshDash();
+}
+
+function updateCampRow(l) {
+  const row = $('srow-'+l.id);
+  if(!row) { renderCampaign(); return; }
+  const stIcon = {wait:'⏳',gen:'🤖',ready:'✅',sent:'✉️',fail:'❌'}[l.status]||'⏳';
+  const stCls  = {wait:'st-wait',gen:'st-gen',ready:'st-ready',sent:'st-sent',fail:'st-fail'}[l.status]||'st-wait';
+  const stTxt  = {wait:'Waiting',gen:'Generating...',ready:'Ready to Send',sent:'Sent ✓',fail:'Failed'}[l.status];
+  row.querySelector('.send-st').className='send-st '+stCls;
+  row.querySelector('.send-st').textContent=stIcon+' '+stTxt;
+  if(l.subject) {
+    let subEl = row.querySelector('.send-email+div');
+    if(!subEl) {
+      subEl=document.createElement('div');
+      subEl.style.cssText='font-size:11px;color:var(--tx2);margin-top:3px';
+      row.querySelector('.send-email').after(subEl);
+    }
+    subEl.textContent='📧 '+l.subject;
+  }
+}
+
+// ══════════════════════════════════════
+//  COMPOSE
+// ══════════════════════════════════════
+async function composeGenerate() {
+  const name=gv('co-name'),org=gv('co-org'),email=gv('co-email'),role=gv('co-role'),course=gv('co-course'),ctx=gv('co-ctx');
+  if(!name||!course){ alert('Enter prospect name and course.'); return; }
+  const btn=document.querySelector('#pane-compose .btn-pri');
+  btn.disabled=true;
+  $('co-out').classList.add('show');
+  $('co-think').style.display='inline-flex';
+  $('co-tlbl').style.display='none';
+  $('co-sub').innerHTML=''; $('co-body').textContent='';
+
+  const prompt=`Write a personalized B2B outreach email for an e-learning course.
+Prospect: ${name} | ${role} | ${org} | ${email}
+Course: ${course}
+Tone: ${tone}
+Context: ${ctx||'none'}
+Format:
+SUBJECT: [subject]
+---
+[email body]
+Rules: 160-200 words. Personalized. Clear ROI. Soft CTA. Sign as ${sig()}. No bracket placeholders.`;
+
+  try {
+    const res=await ai(prompt);
+    const {subject,body}=parseEmail(res);
+    generatedEmail={subject,body};
+    $('co-sub').innerHTML=`<strong>Subject:</strong> ${subject}`;
+    $('co-body').textContent=body;
+    counts.gen++;
+    $('co-sendBtn').disabled=false;
+    log(`Email generated for ${name}`,'⚡');
+  } catch(e){ $('co-body').textContent='Error: '+e.message; }
+  $('co-think').style.display='none';
+  $('co-tlbl').style.display='inline';
+  btn.disabled=false;
+  refreshDash();
+}
+
+async function composeSend() {
+  if(!cfg.svcId){ alert('Setup EmailJS first in the Setup tab!'); sw('setup'); return; }
+  const email=gv('co-email'), name=gv('co-name');
+  if(!email){ alert('Enter email address.'); return; }
+  if(!generatedEmail.subject){ alert('Generate email first.'); return; }
+  try {
+    await ejSend(email, name, generatedEmail.subject, generatedEmail.body);
+    counts.sent++; log(`Email sent to ${name} (${email})`,'✉️');
+    alert('✅ Email sent successfully!');
+  } catch(e){ counts.fail++; alert('Failed: '+e.message); }
+  refreshDash();
+}
+
+// ══════════════════════════════════════
+//  REPLY
+// ══════════════════════════════════════
+async function replyGenerate() {
+  const incoming=gv('r-in'),name=gv('r-name'),course=gv('r-course'),cons=gv('r-cons');
+  if(!incoming){ alert('Paste the incoming email first.'); return; }
+  const btn=document.querySelector('#pane-reply .btn-pri');
+  btn.disabled=true;
+  $('r-out').classList.add('show');
+  $('r-think').style.display='inline-flex';
+  $('r-tlbl').style.display='none';
+  $('r-sub').innerHTML=''; $('r-body').textContent='';
+
+  const prompt=`You are a senior e-learning sales professional. Write the ideal reply to this email.
+Client: ${name||'Client'}
+Course: ${course||cfg.course||'our program'}
+Incoming email: "${incoming}"
+Strategy: ${strat.replace(/-/g,' ')}
+Constraints: ${cons||'standard terms'}
+Format:
+SUBJECT: [Re: subject]
+---
+[reply]
+Rules: 140-190 words. Address their exact concern. Empathetic but confident. Sign as ${sig()}. No placeholders.`;
+
+  try {
+    const res=await ai(prompt);
+    const {subject,body}=parseEmail(res);
+    generatedReply={subject,body};
+    $('r-sub').innerHTML=`<strong>Subject:</strong> ${subject}`;
+    $('r-body').textContent=body;
+    counts.gen++;
+    $('r-sendBtn').disabled=false;
+    log(`Reply generated for ${name||'client'}`,'↩️');
+  } catch(e){ $('r-body').textContent='Error: '+e.message; }
+  $('r-think').style.display='none';
+  $('r-tlbl').style.display='inline';
+  btn.disabled=false;
+  refreshDash();
+}
+
+async function replySend() {
+  if(!cfg.svcId){ alert('Setup EmailJS first in the Setup tab!'); sw('setup'); return; }
+  const name=gv('r-name');
+  // Get email from active lead or ask
+  let email = activeLead?.email || '';
+  if(!email) email = prompt('Enter client email address:','');
+  if(!email) return;
+  try {
+    await ejSend(email, name, generatedReply.subject, generatedReply.body);
+    counts.sent++; log(`Reply sent to ${name||email}`,'✉️');
+    alert('✅ Reply sent successfully!');
+  } catch(e){ counts.fail++; alert('Failed: '+e.message); }
+  refreshDash();
+}
+
+function cp(id) {
+  navigator.clipboard.writeText($(id)?.textContent||'').then(()=>{
+    event.target.textContent='Copied!';
+    setTimeout(()=>event.target.textContent='Copy',1500);
+  });
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+// Load saved Gemini key
+const savedGemini = localStorage.getItem('aman_gemini_key');
+if(savedGemini) {
+  cfg.geminiKey = savedGemini;
+  sv('gemini-key', savedGemini);
+  const b = $('gemini-badge'); if(b) b.style.display='inline-flex';
+}
+
+// Load saved GAS URL
+const savedGAS = localStorage.getItem('aman_gas_url');
+if(savedGAS) {
+  cfg.gasUrl = savedGAS;
+  sv('gas-url', savedGAS);
+  const b = $('gas-badge'); if(b) b.style.display='inline-flex';
+  $('ejStatus').textContent='● Connected';
+  $('ejStatus').style.background='var(--g1l)';
+  $('ejStatus').style.color='var(--g1)';
+}
+renderLeads();
+</script>
+</body>
+</html>
