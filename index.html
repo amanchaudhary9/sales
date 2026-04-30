@@ -223,7 +223,7 @@ tr:hover td{background:var(--bg4)}
       <!-- ══ SETUP ══ -->
       <div class="pane on" id="pane-setup">
         <div class="info-box">
-          ℹ️ <div>Sirf <strong>2 steps</strong> karo — Google ka free plan use hoga. Koi credit card nahi chahiye.</div>
+          ℹ️ <div>Only <strong>2 steps</strong> and you're done — it uses Google's free plan. No credit card required.</div>
         </div>
 
         <!-- STEP 1: Gemini API -->
@@ -235,15 +235,15 @@ tr:hover td{background:var(--bg4)}
           <div class="setup-card-sub">Google AI Studio bilkul free hai. Isse AI email likhega, leads extract karega.</div>
           <div class="step-row">
             <div class="step-num">1</div>
-            <div class="step-txt">Jaao → <a href="https://aistudio.google.com/apikey" target="_blank"><strong>aistudio.google.com/apikey</strong></a></div>
+            <div class="step-txt">Go → <a href="https://aistudio.google.com/apikey" target="_blank"><strong>aistudio.google.com/apikey</strong></a></div>
           </div>
           <div class="step-row">
             <div class="step-num">2</div>
-            <div class="step-txt">Google account se login karo → <strong>"Create API Key"</strong> click karo</div>
+            <div class="step-txt">Google account login → <strong>"Create API Key"</strong> click karo</div>
           </div>
           <div class="step-row">
             <div class="step-num">3</div>
-            <div class="step-txt">Key copy karo (AIza... se shuru hogi) → neeche paste karo → Save karo</div>
+            <div class="step-txt">Copy the key (AIza... start with) → paste → Click Save </div>
           </div>
           <div style="height:12px"></div>
           <div class="field">
@@ -256,17 +256,17 @@ tr:hover td{background:var(--bg4)}
         <!-- STEP 2: Google Apps Script -->
         <div class="setup-card">
           <div class="setup-card-title">
-            📧 Step 2 — Google Apps Script (Email Bhejne ke liye)
+            📧 Step 2 — Google Apps Script (For Email )
             <span id="gas-badge" style="display:none" class="connected-badge">✓ Connected</span>
           </div>
-          <div class="setup-card-sub">Aapki Gmail se emails jaayengi — bilkul free, unlimited emails.</div>
+          <div class="setup-card-sub">Emails will be sent directly from your Gmail account. —  free, unlimited emails.</div>
           <div class="step-row">
             <div class="step-num">1</div>
-            <div class="step-txt">Jaao → <a href="https://script.google.com" target="_blank"><strong>script.google.com</strong></a> → "New Project" click karo</div>
+            <div class="step-txt">Go → <a href="https://script.google.com" target="_blank"><strong>script.google.com</strong></a> → "New Project" click karo</div>
           </div>
           <div class="step-row">
             <div class="step-num">2</div>
-            <div class="step-txt">Poora code delete karo, aur <strong>neeche diya code paste karo</strong> → Save karo (Ctrl+S)</div>
+            <div class="step-txt">Delete the entire code, and <strong>paste the code provided below</strong> → Save (Ctrl+S)</div>
           </div>
           <div class="step-row">
             <div class="step-num">3</div>
@@ -274,7 +274,7 @@ tr:hover td{background:var(--bg4)}
           </div>
           <div class="step-row">
             <div class="step-num">4</div>
-            <div class="step-txt">Web App URL copy karo → neeche paste karo → Save karo</div>
+            <div class="step-txt">Web App URL copy karo → Paste it below. → Save </div>
           </div>
 
           <div style="background:var(--bg4);border:1px solid var(--b2);border-radius:var(--rd);padding:12px;margin:12px 0">
@@ -297,7 +297,7 @@ tr:hover td{background:var(--bg4)}
       .setMimeType(ContentService.MimeType.JSON);
   }
 }</pre>
-            <button class="btn-sm" onclick="copyGasCode()" style="margin-top:8px">📋 Code Copy Karo</button>
+            <button class="btn-sm" onclick="copyGasCode()" style="margin-top:8px">📋 Copy the code.</button>
           </div>
 
           <div class="field">
@@ -312,8 +312,8 @@ tr:hover td{background:var(--bg4)}
 
         <!-- STEP 3: Sender Info -->
         <div class="setup-card">
-          <div class="setup-card-title">👤 Step 3 — Aapki Details (Signature ke liye)</div>
-          <div class="setup-card-sub">Yeh sab emails mein signature mein aayega.</div>
+          <div class="setup-card-title">👤 Step 3 — Your Details (for Signature)</div>
+          <div class="setup-card-sub">These details will be automatically included in your email signature..</div>
           <div class="g2">
             <div class="field"><span class="lbl">Aapka Naam</span><input class="inp" id="s-sname" placeholder="e.g. Aman Chaudhary" /></div>
             <div class="field"><span class="lbl">Designation</span><input class="inp" id="s-desig" placeholder="e.g. Sales Manager" /></div>
@@ -734,7 +734,7 @@ function saveAIKey() {
 async function ai(prompt) {
   const key = cfg.geminiKey || localStorage.getItem('aman_gemini_key') || '';
   if(!key) {
-    alert('Setup Tab mein Google Gemini API Key daalo!\n\n1. aistudio.google.com pe jaao\n2. Get API Key click karo\n3. Copy karo → Setup Tab mein paste karo');
+    alert('Setup Tab mein Google Gemini API Key daalo!\n\n1. aistudio.google.com pe Go\n2. Get API Key click karo\n3. Copy karo → Setup Tab mein paste karo');
     sw('setup');
     throw new Error('No Gemini API key');
   }
