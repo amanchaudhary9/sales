@@ -315,7 +315,7 @@ tr:hover td{background:var(--bg4)}
           <div class="setup-card-title">👤 Step 3 — Your Details (for Signature)</div>
           <div class="setup-card-sub">These details will be automatically included in your email signature..</div>
           <div class="g2">
-            <div class="field"><span class="lbl">Aapka Naam</span><input class="inp" id="s-sname" placeholder="e.g. Aman Chaudhary" /></div>
+            <div class="field"><span class="lbl">Your Name</span><input class="inp" id="s-sname" placeholder="e.g. Aman Chaudhary" /></div>
             <div class="field"><span class="lbl">Designation</span><input class="inp" id="s-desig" placeholder="e.g. Sales Manager" /></div>
           </div>
           <div class="g2">
@@ -622,7 +622,7 @@ function saveGeminiKey() {
   localStorage.setItem('aman_gemini_key', key);
   $('gemini-badge').style.display = 'inline-flex';
   log('Gemini API key saved ✅', '🤖');
-  alert('✅ Gemini API Key saved! AI features active hain.');
+  alert('✅ Gemini API Key saved! AI features are now active.');
 }
 
 // ══════════════════════════════════════
@@ -638,22 +638,22 @@ function saveGAS() {
   localStorage.setItem('aman_gas_url', url);
   $('gas-badge').style.display = 'inline-flex';
   log('Google Apps Script connected ✅', '📧');
-  alert('✅ Email sender connected! Test email bhejo verify karne ke liye.');
+  alert('✅ Email sender connected! Send a test email to verify.');
 }
 
 function copyGasCode() {
   const code = $('gasCode')?.textContent || '';
   navigator.clipboard.writeText(code).then(() => {
-    alert('✅ Code copy ho gaya! Ab script.google.com mein paste karo.');
+    alert('✅ Code copied! Now paste in script.google.com .');
   });
 }
 
 async function testEmail() {
-  const testTo = prompt('Apna email address likho test ke liye:', '');
+  const testTo = prompt('Enter your email address to receive the test email:', '');
   if(!testTo) return;
   try {
-    await ejSend(testTo, 'Test User', 'Aman Sales AI — Test Email ✅', 'Yeh ek test email hai.\n\nAgar yeh aaya hai toh aapka email system bilkul sahi kaam kar raha hai!');
-    alert('✅ Test email bhej diya!\n\nApna inbox check karo (Spam folder bhi).\n\nNote: Google Apps Script "no-cors" mode mein kaam karta hai, isliye koi error nahi aayega — email aaye na aaye. Agar 2 min mein na aaye toh Apps Script check karo.');
+    await ejSend(testTo, 'Test User', 'Aman Sales AI — Test Email ✅', 'This is the test mail\n\nIf you see this, your email system is working perfectly.!');
+    alert('✅ Test email sended!\n\nCheck your inbox (Also Spam folder ).\n\nNote: Google Apps Script "no-cors" It works in background mode, so no errors will pop up—whether the email arrives or not. If it doesn’t show up within 2 minutes, check your Apps Script.');
   } catch(e) {
     alert('❌ Error: ' + e.message);
   }
@@ -661,11 +661,11 @@ async function testEmail() {
 
 
 async function testEmail() {
-  const testTo = prompt('Apna email address likho test ke liye:', '');
+  const testTo = prompt('Enter your email address to receive the test email:', '');
   if(!testTo) return;
   try {
-    await ejSend(testTo, 'Test User', 'Aman Sales AI — Test Email ✅', 'Yeh ek test email hai.\n\nAgar yeh aaya hai toh aapka email system bilkul sahi kaam kar raha hai!');
-    alert('✅ Test email bhej diya!\n\nApna inbox check karo (Spam folder bhi).\n\nNote: Google Apps Script "no-cors" mode mein kaam karta hai, isliye koi error nahi aayega — email aaye na aaye. Agar 2 min mein na aaye toh Apps Script check karo.');
+    await ejSend(testTo, 'Test User', 'Aman Sales AI — Test Email ✅', 'This is the test mail\n\nIf you see this, your email system is working perfectly.!');
+    alert('✅ Test email sended!\n\nCheck your inbox (Also Spam folder ).\n\nNote: Google Apps Script "no-cors" It works in background mode, so no errors will pop up—whether the email arrives or not. If it doesn’t show up within 2 minutes, check your Apps Script.');
   } catch(e) {
     alert('❌ Error: ' + e.message);
   }
@@ -674,20 +674,20 @@ async function testEmail() {
 
 
 async function testEmail() {
-  const testTo = prompt('Apna email address likho jahan test email aaye:','');
+  const testTo = prompt('Enter your email address to receive the test email:','');
   if(!testTo) return;
   try {
-    await ejSend(testTo, 'Test', 'Aman Sales AI — Test Email', 'Yeh ek test email hai. EmailJS sahi se kaam kar raha hai! ✅');
-    alert('✅ Test email gaya! Apna inbox check karo (spam bhi dekho).');
+    await ejSend(testTo, 'Test', 'Aman Sales AI — Test Email', 'This is a test email. EmailJS is working correctly! ✅');
+    alert('✅ Test email sent! Check your inbox (also check the spam folder).');
   } catch(e) {
-    alert('❌ Email send nahi hua:\n'+e.message+'\n\nCheck karo:\n1. Service ID/Template ID/Public Key sahi hain?\n2. Gmail account connected hai EmailJS mein?\n3. Template mein {{to_email}}, {{subject}}, {{message}} variables hain?');
+    alert('❌ Email not send:\n'+e.message+'\n\nPlease check:\n1. Service ID/Template ID/Public Key is correct?\n2. Gmail account is connected in EmailJS?\n3. Template {{to_email}}, {{subject}}, {{message}} is variable?');
   }
 }
 
 function saveSender() {
   cfg.senderName = gv('s-sname')||'Aman Chaudhary';
-  cfg.desig      = gv('s-desig')||'Sales Manager';
-  cfg.company    = gv('s-comp')||'Aman EduTech';
+  cfg.desig      = gv('s-desig')||'E-Learning Developer';
+  cfg.company    = gv('s-comp')||'Aman HappCoach';
   cfg.phone      = gv('s-phone');
   cfg.course     = gv('s-course');
   log('Sender info saved','👤');
@@ -697,7 +697,7 @@ function saveSender() {
 async function ejSend(toEmail, toName, subject, body) {
   const scriptUrl = cfg.gasUrl || localStorage.getItem('aman_gas_url') || '';
   if(!scriptUrl) {
-    throw new Error('Google Apps Script URL setup nahi hai. Setup Tab mein daalo.');
+    throw new Error('Google Apps Script URL is not setup. Put it in Setup Tab.');
   }
   const sig = `\n\n---\n${cfg.senderName||'Aman'}\n${cfg.desig||'Sales Manager'} | ${cfg.company||'Aman EduTech'}${cfg.phone?'\nPh: '+cfg.phone:''}`;
   const payload = { to: toEmail, name: toName||'Prospect', subject: subject||'Important Message', body: body + sig };
