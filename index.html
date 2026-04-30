@@ -229,7 +229,7 @@ tr:hover td{background:var(--bg4)}
         <!-- STEP 1: Gemini API -->
         <div class="setup-card">
           <div class="setup-card-title">
-            🤖 Step 1 — Google Gemini API Key (AI ke liye)
+            🤖 Step 1 — Google Gemini API Key
             <span id="gemini-badge" style="display:none" class="connected-badge">✓ Saved</span>
           </div>
           <div class="setup-card-sub">Google AI Studio bilkul free hai. Isse AI email likhega, leads extract karega.</div>
@@ -239,7 +239,7 @@ tr:hover td{background:var(--bg4)}
           </div>
           <div class="step-row">
             <div class="step-num">2</div>
-            <div class="step-txt">Google account login → <strong>"Create API Key"</strong> click karo</div>
+            <div class="step-txt">Google account login → <strong>"Create API Key"</strong> Click now</div>
           </div>
           <div class="step-row">
             <div class="step-num">3</div>
@@ -262,7 +262,7 @@ tr:hover td{background:var(--bg4)}
           <div class="setup-card-sub">Emails will be sent directly from your Gmail account. —  free, unlimited emails.</div>
           <div class="step-row">
             <div class="step-num">1</div>
-            <div class="step-txt">Go → <a href="https://script.google.com" target="_blank"><strong>script.google.com</strong></a> → "New Project" click karo</div>
+            <div class="step-txt">Go → <a href="https://script.google.com" target="_blank"><strong>script.google.com</strong></a> → "New Project" Click now</div>
           </div>
           <div class="step-row">
             <div class="step-num">2</div>
@@ -734,7 +734,7 @@ function saveAIKey() {
 async function ai(prompt) {
   const key = cfg.geminiKey || localStorage.getItem('aman_gemini_key') || '';
   if(!key) {
-    alert('Setup Tab mein Google Gemini API Key daalo!\n\n1. aistudio.google.com pe Go\n2. Get API Key click karo\n3. Copy karo → Setup Tab mein paste karo');
+    alert('Setup Tab mein Google Gemini API Key daalo!\n\n1. aistudio.google.com pe Go\n2. Get API Key Click now\n3. Copy karo → Setup Tab mein paste karo');
     sw('setup');
     throw new Error('No Gemini API key');
   }
@@ -1083,17 +1083,17 @@ async function sendAllEmails() {
 
   cfg.gasUrl = cfg.gasUrl || localStorage.getItem('aman_gas_url') || '';
   if(!cfg.gasUrl) {
-    alert('❌ Email sender setup nahi hai!\n\nSetup Tab → Step 2 (Google Apps Script) complete karo.');
+    alert('❌ Email sender not setup!\n\nSetup Tab → Step 2 (Google Apps Script) complete now.');
     sw('setup');
     return;
   }
 
   const readyLeads = campaign.filter(c => c.status === 'ready');
   if(!readyLeads.length) {
-    alert('Pehle "Generate All Emails" click karo — koi email ready nahi hai abhi.');
+    alert('Pehle "Generate All Emails" Click now — No email is ready.');
     return;
   }
-  if(!confirm(`${readyLeads.length} emails bhejne hain. Confirm karein?`)) return;
+  if(!confirm(`${readyLeads.length} want to send emails.. Confirm?`)) return;
 
   const btn = $('sendAllBtn');
   btn.disabled = true;
@@ -1132,7 +1132,7 @@ async function sendAllEmails() {
   let msg = `\n✅ ${sent} emails sent!`;
   if(fail > 0) {
     msg += `\n❌ ${fail} fail hue:\n${errors.slice(0,5).join('\n')}`;
-    msg += '\n\nCheck karo: emailjs.com → Logs mein dekho kya error hai.';
+    msg += '\n\nCheck: emailjs.com → Check the logs for errors.';
   }
   alert(msg);
   log(`Campaign done: ${sent} sent, ${fail} failed`, '🎯');
